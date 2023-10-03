@@ -25,7 +25,12 @@
       "prisma/**/*",
       "node_modules/.prisma/**/*",
       "node_modules/@prisma/client/**/*"
-    ]
+    ],
+    "win": {
+      "publish": [
+        "github"
+      ]
+    }
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
