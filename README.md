@@ -1,6 +1,6 @@
 # Simple Customer Ledger
 
-This project is a simple electron app for keeping customer tracks of customer account of a small pharmacy store.
+This project is a simple electron app for keeping customer track of customer accounts of a small pharmacy store.
 
 - [remix-electron docs](https://github.com/itsMapleLeaf/remix-electron)
 - [Remix docs](https://remix.run/docs)
