@@ -1,4 +1,10 @@
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  isRouteErrorResponse,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+} from "@remix-run/react";
 import {
   LoaderArgs,
   SerializeFrom,
@@ -15,7 +21,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { getCustomerById, updateCustomer } from "~/services/customer.services";
-import { z } from "zod";
+import { any, z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ICustomer } from "~/types/types";
@@ -70,12 +76,19 @@ export const action = async ({ request, params }: LoaderArgs) => {
   const customerId = params.customerId as string;
 
   if (request.method === "DELETE") {
-    await db.customer.delete({
-      where: {
-        id: +customerId,
-      },
-    });
-    return redirect("/customers");
+    try {
+      await db.customer.delete({
+        where: {
+          id: +customerId,
+        },
+      });
+      return redirect("/customers");
+    } catch (error) {
+      throw json(
+        { code: "CUS1002", message: "Customer has transactions!" },
+        422
+      );
+    }
   }
 
   const formData = await request.formData();
@@ -91,7 +104,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
     remark,
   } as Customer);
 
-  return json({ customer });
+  return json({ customer, errorMessage: null });
 };
 
 export default function CustomersPage() {
@@ -146,10 +159,10 @@ export default function CustomersPage() {
               Edit
             </Button>
             <AlertDialog>
-              <AlertDialogTrigger>
-                <Button type="button" variant={"destructive"}>
-                  Delete
-                </Button>
+              <AlertDialogTrigger type="button" style={{ color: "red" }}>
+                {/* <Button type="button" variant={"destructive"}> */}
+                Delete
+                {/* </Button> */}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -173,6 +186,9 @@ export default function CustomersPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            {/* {actionData?.errorMessage ? (
+              <p>{actionData?.errorMessage}</p>
+            ) : null} */}
           </CardFooter>
         </Card>
       )}
@@ -306,4 +322,52 @@ export function CustomerEditForm({
       </CardContent>
     </Card>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    let errorContent = (
+      <AlertDialogHeader>
+        <AlertDialogTitle>{error.data.code}</AlertDialogTitle>
+        <AlertDialogDescription>{error.data.message}</AlertDialogDescription>
+      </AlertDialogHeader>
+    );
+
+    if (error.data.code === "CUS1002") {
+      errorContent = (
+        <AlertDialogHeader>
+          <AlertDialogTitle>{error.data.message}</AlertDialogTitle>
+          <AlertDialogDescription>
+            Customer has transactions. Please, delete the transation first or
+            create a new customer.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+      );
+    }
+
+    return (
+      <AlertDialog defaultOpen={true}>
+        <AlertDialogContent>
+          {errorContent}
+          <AlertDialogFooter>
+            <AlertDialogCancel>OK</AlertDialogCancel>
+            {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+        <p>The stack trace is:</p>
+        <pre>{error.stack}</pre>
+      </div>
+    );
+  } else {
+    return <h1>Unknown Error</h1>;
+  }
 }

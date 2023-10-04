@@ -42,8 +42,6 @@ export default function Customer() {
   const { transactions, hasNext, hasPrev, currentPage, totalPages } =
     useLoaderData<typeof loader>();
 
-  console.log(1);
-
   return (
     <div className="container mx-auto py-5 h-full">
       <div className="flex items-center justify-between space-y-2 mb-5">

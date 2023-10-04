@@ -60,7 +60,6 @@ export async function action({ request }: ActionArgs) {
     remark: remark,
   } as Customer);
   return redirect("/customers");
-  // return json({ customer: newCustomer });
 }
 
 export default function () {
@@ -79,23 +78,12 @@ export default function () {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     fetcher.submit(values, {
       method: "POST",
     });
   };
 
   return (
-    // <div className="container mx-auto py-5">
-    //   <div className="flex items-center justify-between space-y-2 mb-5">
-    //     <h2 className="text-3xl font-bold tracking-tight">
-    //       Create New Customer
-    //     </h2>
-    //     <div className="flex items-center space-x-2">
-    //       <Button onClick={() => navigate("/customer/new")}>Create New</Button>
-    //     </div>
-    //   </div>
     <div className="grid grid-cols-4">
       <div className="col-span-4">
         <Form {...form}>
@@ -109,9 +97,6 @@ export default function () {
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -125,9 +110,6 @@ export default function () {
                   <FormControl>
                     <Input placeholder="01..." {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -139,11 +121,8 @@ export default function () {
                 <FormItem>
                   <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="vill: Sarappur" {...field} />
+                    <Input placeholder="for ex. Sarappur" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -155,11 +134,8 @@ export default function () {
                 <FormItem>
                   <FormLabel>Remark</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -173,9 +149,6 @@ export default function () {
                   <FormControl>
                     <Input type="number" placeholder="0" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -185,6 +158,5 @@ export default function () {
         </Form>
       </div>
     </div>
-    // </div>
   );
 }

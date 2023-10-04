@@ -96,7 +96,7 @@ export default function Index() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {String(totalBalance?._sum.balance)}
+              {totalBalance?._sum.balance || 0}
             </div>
           </CardContent>
         </Card>
@@ -109,7 +109,9 @@ export default function Index() {
             <TakaSign />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalDue?._sum.total_due}</div>
+            <div className="text-2xl font-bold">
+              {totalDue?._sum.total_due || 0}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -122,7 +124,7 @@ export default function Index() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Number(totalpayment?._sum.total_payment)}
+              {totalpayment?._sum.total_payment || 0}
             </div>
           </CardContent>
         </Card>
@@ -134,7 +136,6 @@ export default function Index() {
             <CardTitle className="text-sm font-medium">
               New Customer this month
             </CardTitle>
-            <TakaSign />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{newCustomersThisMonth}</div>

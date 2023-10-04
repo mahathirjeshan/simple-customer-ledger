@@ -81,10 +81,10 @@ export default function () {
       </CardContent>
       <CardFooter className="flex flex-row items-center justify-between space-y-0 pb-2">
         <AlertDialog>
-          <AlertDialogTrigger>
-            <Button type="button" variant={"destructive"}>
-              Delete
-            </Button>
+          <AlertDialogTrigger type="button" style={{ color: "red" }}>
+            {/* <Button type="button" variant={"destructive"}> */}
+            Delete
+            {/* </Button> */}
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

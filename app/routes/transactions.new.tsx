@@ -129,8 +129,6 @@ export default function NewtransactionForm() {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            {/* <CustomerAutoComplete form={form} /> */}
-
             <FormField
               control={form.control}
               name="customerId"
@@ -160,11 +158,11 @@ export default function NewtransactionForm() {
                     <PopoverContent className="w-[500px] p-0">
                       <Command>
                         <CommandInput
-                          placeholder="Search framework..."
+                          placeholder="Search customer..."
                           className="h-9"
                           onChangeCapture={handleOnChangeCapture}
                         />
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>No customer found.</CommandEmpty>
                         <CommandGroup>
                           {customers.map((customer) => (
                             <CommandItem
