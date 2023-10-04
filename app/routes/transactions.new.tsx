@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFetcher, useFetchers } from "@remix-run/react";
+import {
+  isRouteErrorResponse,
+  useFetcher,
+  useFetchers,
+  useRouteError,
+} from "@remix-run/react";
 import {
   ActionArgs,
   LoaderArgs,
@@ -39,6 +44,15 @@ import { Customer } from "@prisma/client";
 import { CheckIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { createTransaction } from "~/services/transaction.services";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 
 const formSchema = z.object({
   customerId: z.coerce.number({ required_error: "Customer is required." }),
@@ -61,15 +75,19 @@ export const action = async ({ request }: ActionArgs) => {
   const invoiceId = formData.get("invoiceId") as string;
   const notes = formData.get("notes") as string;
 
-  const transaction = await createTransaction({
-    customerId: +customerId,
-    due: +due,
-    payment: +payment,
-    invoiceId,
-    notes,
-  });
+  try {
+    const transaction = await createTransaction({
+      customerId: +customerId,
+      due: +due,
+      payment: +payment,
+      invoiceId,
+      notes,
+    });
 
-  return json(transaction);
+    return json(transaction);
+  } catch (error) {
+    throw json({ error }, { status: 500 });
+  }
 };
 
 export default function NewtransactionForm() {
@@ -265,4 +283,58 @@ export default function NewtransactionForm() {
       </CardContent>
     </Card>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    let errorContent = (
+      <AlertDialogHeader>
+        <AlertDialogTitle>{error.data.code}</AlertDialogTitle>
+        <AlertDialogDescription>{error.data.message}</AlertDialogDescription>
+      </AlertDialogHeader>
+    );
+
+    if (error.data.code === "CUS1002") {
+      errorContent = (
+        <AlertDialogHeader>
+          <AlertDialogTitle>{error.data.message}</AlertDialogTitle>
+          <AlertDialogDescription>
+            Customer has transactions. Please, delete the transation first or
+            create a new customer.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+      );
+    }
+
+    return (
+      <AlertDialog defaultOpen={true}>
+        <AlertDialogContent>
+          {errorContent}
+          <AlertDialogFooter>
+            <AlertDialogCancel>OK</AlertDialogCancel>
+            {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <AlertDialog defaultOpen={true}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{error.message}</AlertDialogTitle>
+            <AlertDialogDescription>{error.stack}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>OK</AlertDialogCancel>
+            {/* <AlertDialogAction>Continue</AlertDialogAction> */}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  } else {
+    return <h1>Unknown Error</h1>;
+  }
 }
