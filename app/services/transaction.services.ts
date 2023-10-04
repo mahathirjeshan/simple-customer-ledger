@@ -65,86 +65,86 @@ export const getTransactionsByCustomerId = async (customerId: number) => {
 };
 
 export const createTransaction = async (transaction: Partial<Transaction>) => {
-  return await prisma.$transaction(async (tx) => {
-    // 1. Calculate the balance of the transaction
-    const due = new Decimal(transaction.due as number);
-    const payment = new Decimal(transaction.payment as number);
+  // return await prisma.$transaction(async (tx) => {
+  // 1. Calculate the balance of the transaction
+  const due = new Decimal(transaction.due as number);
+  const payment = new Decimal(transaction.payment as number);
 
-    const balance = payment.sub(due).toNumber();
+  const balance = payment.sub(due).toNumber();
 
-    // 2. Update the customer's balance
-    const customer = await tx.customer.update({
-      where: { id: transaction.customerId },
-      data: {
-        balance: {
-          increment: balance,
-        },
-        total_due: {
-          increment: due.toNumber(),
-        },
-        total_payment: {
-          increment: payment.toNumber(),
-        },
+  // 2. Update the customer's balance
+  const customer = await db.customer.update({
+    where: { id: transaction.customerId },
+    data: {
+      balance: {
+        increment: balance,
       },
-    });
-
-    // 3. Create the transaction
-    const createdTransaction = await tx.transaction.create({
-      data: {
-        ...(transaction as Transaction),
-        due: due.toNumber(),
-        payment: payment.toNumber(),
-        balance_after_transaction: customer.balance,
+      total_due: {
+        increment: due.toNumber(),
       },
-      include: {
-        customer: true,
+      total_payment: {
+        increment: payment.toNumber(),
       },
-    });
-
-    return createdTransaction;
+    },
   });
+
+  // 3. Create the transaction
+  const createdTransaction = await db.transaction.create({
+    data: {
+      ...(transaction as Transaction),
+      due: due.toNumber(),
+      payment: payment.toNumber(),
+      balance_after_transaction: customer.balance,
+    },
+    include: {
+      customer: true,
+    },
+  });
+
+  return createdTransaction;
+  // });
 };
 
 export const deleteTransaction = async (id: number): Promise<Transaction> => {
-  return await prisma.$transaction(async (tx) => {
-    // 1. find the transaction
-    const transaction = await tx.transaction.findUnique({ where: { id } });
+  // return await prisma.$transaction(async (tx) => {
+  // 1. find the transaction
+  const transaction = await db.transaction.findUnique({ where: { id } });
 
-    if (!transaction) {
-      throw new Error(`Transaction number ${id} not found.`);
-    }
+  if (!transaction) {
+    throw new Error(`Transaction number ${id} not found.`);
+  }
 
-    // 2. Calculate the balance of the transaction
-    const due = new Decimal(transaction?.due as number);
-    const payment = new Decimal(transaction?.payment as number);
+  // 2. Calculate the balance of the transaction
+  const due = new Decimal(transaction?.due as number);
+  const payment = new Decimal(transaction?.payment as number);
 
-    const balance = payment.sub(due).toNumber();
+  const balance = payment.sub(due).toNumber();
 
-    console.log({ due, payment, balance });
+  console.log({ due, payment, balance });
 
-    // 3. Update the customer's balance
-    const customer = await tx.customer.update({
-      where: { id: transaction.customerId },
-      data: {
-        balance: {
-          decrement: balance,
-        },
-        total_due: {
-          decrement: due.toNumber(),
-        },
-        total_payment: {
-          decrement: payment.toNumber(),
-        },
+  // 3. Update the customer's balance
+  const customer = await db.customer.update({
+    where: { id: transaction.customerId },
+    data: {
+      balance: {
+        decrement: balance,
       },
-    });
-
-    // 4. Delete the transaction
-    const deletedTransaction = await tx.transaction.delete({
-      where: { id },
-    });
-
-    return deletedTransaction;
+      total_due: {
+        decrement: due.toNumber(),
+      },
+      total_payment: {
+        decrement: payment.toNumber(),
+      },
+    },
   });
+
+  // 4. Delete the transaction
+  const deletedTransaction = await db.transaction.delete({
+    where: { id },
+  });
+
+  return deletedTransaction;
+  // });
 };
 
 const searchTransaction = async () => {};
