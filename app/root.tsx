@@ -12,7 +12,7 @@ import {
 import { Layout } from "~/components/Layout";
 import styles from "./styles.css";
 
-export const meta: V2_MetaFunction = () => [{ title: "New Remix App" }];
+export const meta: V2_MetaFunction = () => [{ title: "Customer Ledger" }];
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 

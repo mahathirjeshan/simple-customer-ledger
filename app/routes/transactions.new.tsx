@@ -10,6 +10,7 @@ import {
   LoaderArgs,
   LoaderFunction,
   json,
+  redirect,
 } from "@remix-run/server-runtime";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -84,7 +85,7 @@ export const action = async ({ request }: ActionArgs) => {
       notes,
     });
 
-    return json(transaction);
+    return redirect(`/transactions/${transaction.id}`);
   } catch (error) {
     throw json({ error }, { status: 500 });
   }

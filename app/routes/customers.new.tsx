@@ -59,7 +59,7 @@ export async function action({ request }: ActionArgs) {
     balance: Number(balance),
     remark: remark,
   } as Customer);
-  return redirect("/customers");
+  return redirect(`/customers/${newCustomer.id}`);
 }
 
 export default function () {
